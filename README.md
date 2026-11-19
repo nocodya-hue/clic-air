@@ -4,6 +4,6 @@ Web de muestra para Clic Air Systems (La Pobla de Farnals, Valencia): aire acond
 
 - Web: https://nocodya-hue.github.io/clic-air/
 - Las fotos de «Obra real» son de la empresa (ficha de Google), mejoradas. Las fotos de servicios y la furgoneta son imágenes generadas, provisionales.
-- La marca (símbolo del difusor rotacional) es una propuesta.
+- El logo es el de Clic Air (su perfil de WhatsApp Business).
 
 Hecha por NOCODYA.

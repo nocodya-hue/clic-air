@@ -64,6 +64,11 @@ p { margin: 0; text-wrap: pretty; }
 .cab.es-solida { background: rgba(20,20,58,.97); box-shadow: 0 1px 0 rgba(255,255,255,.08); }
 .marca { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
 .marca__sim { width: 40px; height: 40px; flex: none; color: var(--techo); }
+/* su logo real: el símbolo va sobre un círculo blanco (las letras «AIR» son blancas) y el texto en blanco */
+.marca { gap: 12px; }
+.marca__chip { width: 46px; height: 46px; flex: none; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 4px 14px -6px rgba(0,0,0,.5); }
+.marca__chip img { width: 35px; height: auto; }
+.marca__texto { height: 15px; width: auto; }
 .marca__placa { fill: var(--plenum-2); stroke: rgba(255,255,255,.14); stroke-width: 2; }
 .marca__txt { display: grid; line-height: 1; }
 .marca__txt b { font: 600 19px/1 var(--f-tit); letter-spacing: -0.03em; }
@@ -316,13 +321,13 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
 .furgo img { width: 100%; }
 .furgo__rueda { position: absolute; aspect-ratio: 1; height: auto; will-change: transform; }
 .furgo::after { content: ''; position: absolute; left: 6%; right: 6%; bottom: -2%; height: 6%; border-radius: 50%; background: radial-gradient(closest-side, rgba(20,20,58,.28), transparent); z-index: -1; }
-.furgo__logo { position: absolute; left: var(--lx, 34%); top: var(--ly, 30%); width: var(--lw, 34%); display: flex; align-items: center; gap: 4%; color: var(--plenum); mix-blend-mode: multiply; }
+.furgo__logo { position: absolute; left: var(--lx, 34%); top: var(--ly, 30%); width: var(--lw, 34%) !important; height: auto; mix-blend-mode: multiply; }
 .furgo__logo svg { width: 26%; flex: none; }
 .furgo__logo span { display: grid; line-height: 1; }
 .furgo__logo b { font: 600 clamp(14px, 2vw, 28px)/1 var(--f-tit); letter-spacing: -0.03em; }
 .furgo__logo small { font: 500 clamp(5px, .6vw, 8.5px)/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; margin-top: 4px; }
-.furgo__tel { position: absolute; left: var(--tx, 36%); top: var(--ty, 58%); font: 500 clamp(8px, 1.05vw, 15px)/1 var(--f-mono); color: var(--plenum); mix-blend-mode: multiply; letter-spacing: .04em; }
-.furgo__franja { position: absolute; left: var(--sx, 8%); right: var(--sr, 6%); top: var(--sy, 66%); height: var(--sh, 4%); background: var(--clic); mix-blend-mode: multiply; border-radius: 2px; }
+.furgo__tel { position: absolute; left: var(--tx, 36%); top: var(--ty, 58%); font: 500 clamp(8px, 1.05vw, 15px)/1 var(--f-mono); color: #105090; mix-blend-mode: multiply; letter-spacing: .04em; }
+.furgo__franja { position: absolute; left: var(--sx, 8%); right: var(--sr, 6%); top: var(--sy, 66%); height: var(--sh, 4%); background: #00c0e0; mix-blend-mode: multiply; border-radius: 2px; }
 
 /* ---------- contacto ---------- */
 .contacto__rejilla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
@@ -351,6 +356,7 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
 .pie { background: var(--plenum); color: rgba(255,255,255,.6); padding: 36px 0 calc(36px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); font-size: 14.5px; }
 .pie__rejilla { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 32px; }
 .pie .marca { color: #fff; }
+.pie .marca__texto { height: 16px; }
 .pie p { flex: 1 1 320px; }
 .pie a { text-decoration: none; }
 .pie__copy { flex: 0 0 auto !important; }
@@ -371,6 +377,9 @@ input[type="range"]::-moz-range-thumb { width: 30px; height: 30px; border: 0; bo
   :root { --envoltura: min(1240px, 100% - 48px); --cab: 68px; }
   body { font-size: 16.5px; line-height: 1.65; }
   .cab { padding: 0 24px; }
+  .marca__chip { width: 42px; height: 42px; }
+  .marca__chip img { width: 32px; }
+  .marca__texto { height: 13px; }
   h2 { line-height: 1.12; }
   .bloque { padding: 96px 0; }
   .titular { margin-bottom: 44px; }
