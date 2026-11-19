@@ -13,7 +13,8 @@
     cab.classList.toggle('es-solida', y > 40);
     if (barra) barra.classList.toggle('ver', y > portada.offsetHeight * 0.6);
   };
-  addEventListener('scroll', alScroll, { passive: true }); alScroll();
+  let pidCab = 0;
+  addEventListener('scroll', () => { if (!pidCab) pidCab = requestAnimationFrame(() => { pidCab = 0; alScroll(); }); }, { passive: true }); alScroll();
 
   /* ---------- abierto ahora (hora de Valencia) ---------- */
   const estado = () => {
@@ -83,7 +84,7 @@
   let W = 0, H = 0, dpr = 1, centro = { x: 0, y: 0, r: 100 }, parts = [], puntero = { x: -1e4, y: -1e4 }, vivo = true, raf = 0;
   const movil = () => innerWidth < 760;
   const medir = () => {
-    dpr = Math.min(devicePixelRatio || 1, movil() ? 1.5 : 2);
+    dpr = 1;   // las estelas no necesitan retina: 4 veces menos píxeles en pantallas de Mac y móvil
     const r = portada.getBoundingClientRect();
     W = r.width; H = r.height;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
@@ -96,20 +97,20 @@
     const t = modo.giro * v;
     return { x: centro.x + Math.cos(a) * r, y: centro.y + Math.sin(a) * r, vx: Math.cos(a) * v - Math.sin(a) * t, vy: Math.sin(a) * v + Math.cos(a) * t, vida: 0, max: 140 + Math.random() * 160, w: 0.8 + Math.random() * 1.4 };
   };
-  const cuantas = () => (movil() ? 110 : 300);
+  const cuantas = () => (movil() ? 60 : 150);
+  const LOTES = 4, lotes = Array.from({ length: LOTES }, () => []);
   const dibujar = () => {
     raf = 0;
     if (!vivo) return;
     cx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cx.clearRect(0, 0, W, H);
-    cx.globalCompositeOperation = 'lighter';
-    cx.strokeStyle = modo.color; cx.lineCap = 'round';
+    cx.strokeStyle = modo.color; cx.lineCap = 'round'; cx.lineWidth = movil() ? 1.3 : 1.5;
     while (parts.length < cuantas()) parts.push(nueva());
+    for (const l of lotes) l.length = 0;
+    const g = 0.006 * modo.giro, c = Math.cos(g), s = Math.sin(g);
     for (let i = parts.length - 1; i >= 0; i--) {
       const p = parts[i];
-      const ox = p.x, oy = p.y;
       // curva en espiral: gira la velocidad un poco cada fotograma
-      const g = 0.006 * modo.giro, c = Math.cos(g), s = Math.sin(g);
       const vx = p.vx * c - p.vy * s, vy = p.vx * s + p.vy * c;
       p.vx = vx * 0.996; p.vy = vy * 0.996 + modo.sube * 0.02;
       // el puntero aparta el aire
@@ -118,9 +119,14 @@
       p.x += p.vx; p.y += p.vy; p.vida++;
       const t = p.vida / p.max;
       if (t >= 1 || p.x < -40 || p.x > W + 40 || p.y < -40 || p.y > H + 40) { parts[i] = nueva(); continue; }
-      cx.globalAlpha = Math.sin(t * Math.PI) * 0.62;
-      cx.lineWidth = p.w;
-      cx.beginPath(); cx.moveTo(ox - p.vx * 7, oy - p.vy * 7); cx.lineTo(p.x, p.y); cx.stroke();
+      lotes[Math.min(LOTES - 1, Math.floor(Math.sin(t * Math.PI) * LOTES))].push(p);
+    }
+    for (let k = 0; k < LOTES; k++) {
+      const l = lotes[k]; if (!l.length) continue;
+      cx.globalAlpha = (k + 0.6) / LOTES * 0.62;
+      cx.beginPath();
+      for (const p of l) { cx.moveTo(p.x - p.vx * 8, p.y - p.vy * 8); cx.lineTo(p.x, p.y); }
+      cx.stroke();
     }
     cx.globalAlpha = 1;
     raf = requestAnimationFrame(dibujar);
@@ -130,10 +136,11 @@
     addEventListener('resize', () => { medir(); parts = []; });
     portada.addEventListener('pointermove', (e) => { const r = portada.getBoundingClientRect(); puntero = { x: e.clientX - r.left, y: e.clientY - r.top }; });
     portada.addEventListener('pointerleave', () => { puntero = { x: -1e4, y: -1e4 }; });
-    new IntersectionObserver(([e]) => { vivo = e.isIntersecting && !document.hidden; if (vivo && !raf) { medir(); raf = requestAnimationFrame(dibujar); } }).observe(portada);
+    new IntersectionObserver(([e]) => { vivo = e.isIntersecting && !document.hidden; if (vivo && !raf && document.readyState === 'complete') { medir(); raf = requestAnimationFrame(dibujar); } }).observe(portada);
     document.addEventListener('visibilitychange', () => { vivo = !document.hidden; if (vivo && !raf) raf = requestAnimationFrame(dibujar); });
     // empezar tras el primer pintado, sin bloquear
-    (window.requestIdleCallback || setTimeout)(() => { medir(); if (!raf) raf = requestAnimationFrame(dibujar); }, { timeout: 600 });
+    const arrancar = () => (window.requestIdleCallback || setTimeout)(() => { medir(); if (!raf) raf = requestAnimationFrame(dibujar); }, { timeout: 1200 });
+    if (document.readyState === 'complete') arrancar(); else addEventListener('load', arrancar, { once: true });
   }
 
   /* ---------- proceso: el plano sigue al paso visible ---------- */
@@ -151,6 +158,7 @@
       es.forEach((e) => { if (e.isIntersecting) activar(+e.target.dataset.paso); });
     }, { rootMargin: '-45% 0px -45% 0px' });
     pasos.forEach((p) => ioP.observe(p));
+    new IntersectionObserver(([e]) => plano.classList.toggle('en-vista', e.isIntersecting)).observe($('#proceso'));
     activar(1);
   }
 
@@ -224,6 +232,6 @@
       ultimo = x;
     };
     if (quieto) furgo.style.transform = `translateX(${innerWidth * 0.3}px)`;
-    else { addEventListener('scroll', () => requestAnimationFrame(mover), { passive: true }); addEventListener('resize', mover); mover(); }
+    else { let pid = 0; addEventListener('scroll', () => { if (!pid) pid = requestAnimationFrame(() => { pid = 0; mover(); }); }, { passive: true }); addEventListener('resize', mover); mover(); }
   }
 })();
